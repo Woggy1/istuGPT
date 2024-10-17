@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatBot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="chat-box">
+            <div class="chat-header">
+                <h1>ChatBot</h1>
+            </div>
+            <div class="chat-body" id="chatBody"> 
+                
+            </div>
+            <form id="chatForm"> 
+                <div class="chat-input">
+                    <input type="text" id="userMessage" placeholder="Type your message..." required> 
+                    <button type="submit" class="btn">Send</button>
+                </div>
+            </form>
+            
+            <form action="{{ url_for('logout') }}" method="post" style="text-align: center; margin-top: 15px;">
+                <button type="submit" class="btn btn-logout">Logout</button>
+            </form>            
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('chatForm'); 
+        const input = document.getElementById('userMessage'); 
+        const chatBody = document.getElementById('chatBody'); 
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault(); 
+            const message = input.value;
+
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: message })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                chatBody.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+                chatBody.innerHTML += `<p><strong>Bot:</strong> ${data.reply}</p>`;
+            } else {
+                chatBody.innerHTML += `<p><strong>Error:</strong> Something went wrong!</p>`;
+            }
+
+            input.value = ''; 
+        });
+    </script>
+</body>
+</html>
